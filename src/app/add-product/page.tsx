@@ -1,6 +1,8 @@
 import FormSubmitButton from '@/components/FormSubmitButton';
 import { prisma } from '@/lib/db/prisma';
+import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
+import { authOptions } from '../api/auth/[...nextauth]/route';
 
 export const metadata = {
     title: 'Add Product - Teddy Store',
@@ -8,6 +10,12 @@ export const metadata = {
 
 const addProduct = async (formData: FormData) => {
     'use server';
+
+    const session = await getServerSession(authOptions);
+
+    if (!session) {
+        redirect('/api/auth/signin?callbackUrl=/add-product');
+    }
 
     const name = formData.get('name')?.toString();
     const description = formData.get('description')?.toString();
@@ -30,13 +38,19 @@ const addProduct = async (formData: FormData) => {
     redirect('/');
 };
 
-const AddProductPage = () => {
+const AddProductPage = async () => {
+    const session = await getServerSession(authOptions);
+
+    if (!session) {
+        redirect('/api/auth/signin?callbackUrl=/add-product');
+    }
+    
     return (
         <div>
-            <h1 className="text-lg mb-3 font-bold">Add product</h1>
+            <h1 className="mb-3 text-lg font-bold">Add product</h1>
             <form action={addProduct}>
                 <input
-                    className="mb-3 w-full input input-bordered"
+                    className="input input-bordered mb-3 w-full"
                     required
                     name="name"
                     placeholder="Name"
@@ -45,17 +59,17 @@ const AddProductPage = () => {
                     required
                     name="description"
                     placeholder="Description"
-                    className="textarea-bordered textarea mb-3 w-full"
+                    className="textarea textarea-bordered mb-3 w-full"
                 />
                 <input
-                    className="mb-3 w-full input input-bordered"
+                    className="input input-bordered mb-3 w-full"
                     required
                     name="imageUrl"
                     placeholder="Image URL"
                     type="url"
                 />
                 <input
-                    className="mb-3 w-full input input-bordered"
+                    className="input input-bordered mb-3 w-full"
                     required
                     name="price"
                     placeholder="Price"
