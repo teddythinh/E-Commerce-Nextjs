@@ -7,10 +7,23 @@ const prismaClientSingleton = () => {
 type PrismaClientSingleton = ReturnType<typeof prismaClientSingleton>;
 
 const globalForPrisma = globalThis as unknown as {
-    prisma: PrismaClient | undefined;
+    prisma: PrismaClientSingleton | undefined;
 };
 
-export const prisma = globalForPrisma.prisma ?? new PrismaClient();
+const prisma = globalForPrisma.prisma ?? prismaClientSingleton();
+
+prisma.$extends({
+    query: {
+        cart: {
+            async update({ args, query }) {
+                args.data = { ...args.data, updatedAt: new Date() };
+                return query(args);
+            }
+        }
+    }
+})
+
+export default prisma;
 
 if (process.env.NODE_ENV === "production") {
     globalForPrisma.prisma = prisma;
