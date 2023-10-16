@@ -4,6 +4,7 @@ import { Inter } from 'next/font/google';
 import Navbar from './Navbar/Navbar';
 import Footer from './Footer';
 import SessionProvider from './SessionProvider';
+import { Analytics } from '@vercel/analytics/react';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -24,6 +25,7 @@ export default function RootLayout({
                     <Navbar />
                     <main className="m-auto min-w-[300px] max-w-7xl p-4">
                         {children}
+                        <Analytics />
                     </main>
                     <Footer />
                 </SessionProvider>
